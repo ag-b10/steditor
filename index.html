@@ -3,9 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Text Editor</title>
+    <style>
+        body {
+            font-family: 'Bahnschrift', 'Arial', sans-serif;
+            background-color: #f8f8f8; /* Light background */
+            color: #333; /* Default text color */
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #0070c9; /* Apple Blue */
+        }
+
+        #editor-container {
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        #editor {
+            flex: 1;
+            min-height: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f8f8f8; /* Light background */
+            color: #333; /* Default editor text color */
+            font-family: 'Bahnschrift', 'Arial', sans-serif;
+            font-size: 16px;
+            resize: none;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #0070c9; /* Apple Blue */
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+            width: fit-content;
+            font-family: 'Bahnschrift', 'Arial', sans-serif;
+        }
+
+        .btn:hover {
+            background-color: #005aa7; /* Darker shade of Apple Blue */
+        }
+
+        #theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #333; /* Default text color */
+        }
+
+        #theme-toggle label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #333; /* Default text color */
+        }
+
+        #theme-toggle input {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 40px;
+            height: 20px;
+            border-radius: 20px;
+            background-color: #ccc;
+            position: relative;
+            outline: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        #theme-toggle input:checked {
+            background-color: #0070c9; /* Apple Blue */
+        }
+
+        #theme-toggle input::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #fff;
+            left: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s;
+        }
+
+        #theme-toggle input:checked::before {
+            left: calc(100% - 2px);
+            transform: translate(-100%, -50%);
+        }
+
+        #theme-toggle input:focus-visible::before {
+            box-shadow: 0 0 0 2px #0070c9; /* Apple Blue */
+        }
+
+        /* Adjusting text color for dark theme */
+        body.dark {
+            background-color: #333;
+            color: #fff;
+        }
+
+        body.dark #editor {
+            background-color: #222;
+            color: #fff;
+        }
+
+        body.dark #theme-toggle {
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
+    <div id="editor-container">
+        <h1>Text Editor</h1>
+        <div id="theme-toggle">
+            <label for="theme">Theme:</label>
+            <input type="checkbox" id="theme" onchange="toggleTheme()">
+        </div>
+        <textarea id="editor" placeholder="Start typing..."></textarea>
+        <button class="btn" onclick="saveText()">Save as .txt</button>
+    </div>
     
+    <script>
+        const editor = document.getElementById('editor');
+        const themeToggle = document.getElementById('theme');
+        const lastSaved = localStorage.getItem('lastSaved');
+
+        // Set initial theme based on user's preference
+        if (localStorage.getItem('theme') === 'dark') {
+            setDarkTheme();
+        } else {
+            setLightTheme();
+        }
+
+        // Set editor content to last saved text or empty string
+        editor.value = lastSaved || '';
+
+        function toggleTheme() {
+            if (themeToggle.checked) {
+                setDarkTheme();
+            } else {
+                setLightTheme();
+            }
+        }
+
+        function setDarkTheme() {
+            document.body.classList.add('dark');
+            editor.style.backgroundColor = '#222';
+            editor.style.color = '#fff';
+            localStorage.setItem('theme', 'dark');
+        }
+
+        function setLightTheme() {
+            document.body.classList.remove('dark');
+            editor.style.backgroundColor = '#f8f8f8';
+            editor.style.color = '#333';
+            localStorage.setItem('theme', 'light');
+        }
+
+        function saveText() {
+            const textToSave = editor.value;
+            const blob = new Blob([textToSave], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'text_file.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            localStorage.setItem('lastSaved', textToSave);
+        }
+    </script>
 </body>
 </html>
